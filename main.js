@@ -35,6 +35,15 @@ function mouseMove(evt) {
     frontCtx.stroke();
     frontCtx.beginPath();
   }
+  else if(currentState == 'triangle'){
+    frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+    frontCtx.moveTo(mouseStartX, mouseStartY);
+    frontCtx.lineTo(mousePos.x, mousePos.y);
+    frontCtx.lineTo(mouseStartX, mousePos.y);
+    frontCtx.lineTo(mouseStartX, mouseStartY);
+    frontCtx.stroke();
+    frontCtx.beginPath();
+  }
 }
 
 /* mouse dragging info */
@@ -72,6 +81,14 @@ frontCanvas.addEventListener('mouseup', function(evt) {
   else if(currentState == 'circle'){
     frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
     backCtx.ellipse(mouseStartX + dx/2, mouseStartY + dy/2, Math.abs(dx)/2, Math.abs(dy)/2, 0, 0, Math.PI*2);
+    backCtx.stroke();
+  }
+  else if(currentState == 'triangle'){
+    frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+    backCtx.moveTo(mouseStartX, mouseStartY);
+    backCtx.lineTo(mousePos.x, mousePos.y);
+    backCtx.lineTo(mouseStartX, mousePos.y);
+    backCtx.lineTo(mouseStartX, mouseStartY);
     backCtx.stroke();
   }
 
