@@ -108,6 +108,8 @@ function drawColorPicker(){
   /* change color according to xy */
   var imgData = colorPickerCtx.getImageData(colorPickerX, colorPickerY, 1, 1);
   ctx.strokeStyle = 'rgb(' + imgData.data[0] + ',' + imgData.data[1] + ',' + imgData.data[2] + ')';
+  /* font color */
+  ctx.fillStyle = 'rgb(' + imgData.data[0] + ',' + imgData.data[1] + ',' + imgData.data[2] + ')';
 }
 
 /* keep redraw color picker */
