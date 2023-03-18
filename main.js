@@ -38,3 +38,48 @@ var brushSize = "12";
 brushSizeSlider.oninput = function(){
   brushSize = parseInt(this.value, 10);
 }
+
+/* declare functions */
+function toBrush(){
+  console.log('toBrush');
+}
+
+function toEraser(){
+  console.log('toEraser');
+}
+
+function toTyper(){
+  console.log('toTyper');
+}
+
+function toCircle(){
+  console.log('toCircle');
+}
+
+function toTriangle(){
+  console.log('toTriangle');
+}
+
+function toRectangle(){
+  console.log('toRectangle');
+}
+
+function undo(){
+  console.log('undo');
+}
+
+function redo(){
+  console.log('redo');
+}
+
+function clean(){
+  console.log('clean');
+}
+
+function upload(){
+  console.log('upload');
+}
+
+function download(){
+  console.log('download');
+}

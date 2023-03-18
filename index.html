@@ -67,23 +67,23 @@
             <div class="col">
               <div class="row row-cols-1">
                 <div class="col">
-                  <button class="btn w-25"><i class="fa-solid fa-paintbrush"></i></i></button>
-                  <button class="btn w-25"><i class="fa-solid fa-eraser"></i></button>
-                  <button class="btn w-25"><i class="fa-solid fa-keyboard"></i></button>
+                  <button class="btn w-25" onclick="toBrush()"><i class="fa-solid fa-paintbrush"></i></i></button>
+                  <button class="btn w-25" onclick="toEraser()"><i class="fa-solid fa-eraser"></i></button>
+                  <button class="btn w-25" onclick="toTyper()"><i class="fa-solid fa-keyboard"></i></button>
                 </div>
                 <div class="col">
-                  <button class="btn w-25"><i class="fa-regular fa-circle"></i></button>
-                  <button class="btn w-25"><i class="bi bi-triangle"></i></button>
-                  <button class="btn w-25"><i class="fa-regular fa-square"></i></button>
+                  <button class="btn w-25" onclick="toCircle()"><i class="fa-regular fa-circle"></i></button>
+                  <button class="btn w-25" onclick="toTriangle()"><i class="bi bi-triangle"></i></button>
+                  <button class="btn w-25" onclick="toRectangle()"><i class="fa-regular fa-square"></i></button>
                 </div>
                 <div class="col">
-                  <button class="btn w-25"><i class="fa-solid fa-rotate-left"></i></button>
-                  <button class="btn w-25"><i class="fa-solid fa-rotate-right"></i></i></button>
-                  <button id="reset" class="btn w-25"><i class="fa-solid fa-trash-arrow-up"></i></i></button>
+                  <button class="btn w-25" onclick="undo()"><i class="fa-solid fa-rotate-left"></i></button>
+                  <button class="btn w-25" onclick="redo()"><i class="fa-solid fa-rotate-right"></i></button>
+                  <button class="btn w-25" onclick="clean()"><i class="fa-solid fa-trash-arrow-up"></i></button>
                 </div>
                 <div class="col">
-                  <button class="btn w-25"><i class="fa-solid fa-upload"></i></button>
-                  <button class="btn w-25"><i class="fa-solid fa-download"></i></button>
+                  <button class="btn w-25" onclick="upload()"><i class="fa-solid fa-upload"></i></button>
+                  <button class="btn w-25" onclick="download()"><i class="fa-solid fa-download"></i></button>
                 </div>
               </div>
             </div>
