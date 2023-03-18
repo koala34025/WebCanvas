@@ -18,18 +18,22 @@ function getMousePos(canvas, evt) {
 function mouseMove(evt) {
   var mousePos = getMousePos(frontCanvas, evt);
 
-  console.log(currentState);
+  var dx = mousePos.x - mouseStartX;
+  var dy = mousePos.y - mouseStartY;
 
   if(currentState == 'brush' || currentState == 'eraser'){
     backCtx.lineTo(mousePos.x, mousePos.y);
     backCtx.stroke();
   }
   else if(currentState == 'rectangle'){
-    var dx = mousePos.x - mouseStartX;
-    var dy = mousePos.y - mouseStartY;
-
     frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
     frontCtx.strokeRect(mouseStartX, mouseStartY, dx, dy);
+  }
+  else if(currentState == 'circle'){
+    frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+    frontCtx.ellipse(mouseStartX + dx/2, mouseStartY + dy/2, Math.abs(dx)/2, Math.abs(dy)/2, 0, 0, Math.PI*2);
+    frontCtx.stroke();
+    frontCtx.beginPath();
   }
 }
 
@@ -44,7 +48,6 @@ frontCanvas.addEventListener('mousedown', function(evt) {
 
   var mousePos = getMousePos(frontCanvas, evt);
   backCtx.beginPath();
-  backCtx.moveTo(mousePos.x, mousePos.y);
 
   frontCtx.lineWidth = brushSize;
   backCtx.lineWidth = brushSize;
@@ -59,12 +62,17 @@ frontCanvas.addEventListener('mousedown', function(evt) {
 frontCanvas.addEventListener('mouseup', function(evt) {
   var mousePos = getMousePos(frontCanvas, evt);
 
-  if(currentState == 'rectangle'){
-    var dx = mousePos.x - mouseStartX;
-    var dy = mousePos.y - mouseStartY;
+  var dx = mousePos.x - mouseStartX;
+  var dy = mousePos.y - mouseStartY;
 
+  if(currentState == 'rectangle'){
     frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
     backCtx.strokeRect(mouseStartX, mouseStartY, dx, dy);
+  }
+  else if(currentState == 'circle'){
+    frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+    backCtx.ellipse(mouseStartX + dx/2, mouseStartY + dy/2, Math.abs(dx)/2, Math.abs(dy)/2, 0, 0, Math.PI*2);
+    backCtx.stroke();
   }
 
   frontCanvas.removeEventListener('mousemove', mouseMove, false);
