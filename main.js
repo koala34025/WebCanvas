@@ -6,6 +6,10 @@ var frontCtx = frontCanvas.getContext('2d');
 var backCanvas = document.getElementById('backCanvas');
 var backCtx = backCanvas.getContext('2d');
 
+/* redo undo state */
+let state = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
+window.history.pushState(state, null);
+
 /* black line drawing */
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
@@ -93,6 +97,9 @@ frontCanvas.addEventListener('mouseup', function(evt) {
   }
 
   frontCanvas.removeEventListener('mousemove', mouseMove, false);
+
+  let state = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
+  window.history.pushState(state, null);
 }, false);
 
 var fontFamily = document.getElementById('fontFamily');
@@ -115,6 +122,9 @@ frontCanvas.addEventListener('click', function(evt){
       backCtx.font = fontSize.value + "px " + fontFamily.value;
       backCtx.fillText(this.value, parseInt(this.style.left, 10)-105, parseInt(this.style.top, 10)+15);
       document.body.removeChild(this);
+
+      let state = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
+      window.history.pushState(state, null);
     }
   };
 
@@ -254,16 +264,31 @@ function toRectangle(){
 
 function undo(){
   console.log('undo');
+
+  history.back();
 }
 
 function redo(){
   console.log('redo');
+
+  history.forward();
 }
+
+window.addEventListener('popstate', function(evt){
+  backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
+
+  if(evt.state){
+    backCtx.putImageData(evt.state, 0, 0);
+  }
+}, false);
 
 function clean(){
   console.log('clean');
 
   backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
+
+  let state = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
+  window.history.pushState(state, null);
 }
 
 function upload(){
