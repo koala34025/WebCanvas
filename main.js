@@ -44,7 +44,7 @@ var colorPickerCanvas = document.getElementById('colorPicker');
 var colorPickerCtx = colorPickerCanvas.getContext('2d');
 
 var colorPickerX = 0;
-var colorPickerY = 0;
+var colorPickerY = 200;
 
 function drawColorPicker(){
   const gradientH = colorPickerCtx.createLinearGradient(0, 0, 300, 0);
@@ -149,6 +149,8 @@ function redo(){
 
 function clean(){
   console.log('clean');
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function upload(){
