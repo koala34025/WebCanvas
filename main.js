@@ -1,6 +1,9 @@
 var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
-toBrush();
+
+/* shape canvas */
+var shapeCanvas = document.getElementById('shapeCanvas');
+var shapeCtx = shapeCanvas.getContext('2d');
 
 /* black line drawing */
 function getMousePos(canvas, evt) {
@@ -13,9 +16,25 @@ function getMousePos(canvas, evt) {
 
 function mouseMove(evt) {
   var mousePos = getMousePos(canvas, evt);
-  ctx.lineTo(mousePos.x, mousePos.y);
-  ctx.stroke();
+
+  console.log(currentState);
+
+  if(currentState == 'brush' || currentState == 'eraser'){
+    ctx.lineTo(mousePos.x, mousePos.y);
+    ctx.stroke();
+  }
+  else if(currentState == 'rectangle'){
+    var dx = mousePos.x - mouseStartX;
+    var dy = mousePos.y - mouseStartY;
+
+    shapeCtx.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);
+    shapeCtx.strokeRect(mouseStartX, mouseStartY, dx, dy);
+  }
 }
+
+/* mouse dragging info */
+var mouseStartX = 0;
+var mouseStartY = 0;
 
 canvas.addEventListener('mousedown', function(evt) {
   if(currentState == 'typer'){
@@ -27,12 +46,26 @@ canvas.addEventListener('mousedown', function(evt) {
   ctx.moveTo(mousePos.x, mousePos.y);
 
   ctx.lineWidth = brushSize;
+  shapeCtx.lineWidth = brushSize;
+
+  mouseStartX = mousePos.x;
+  mouseStartY = mousePos.y;
 
   evt.preventDefault();
   canvas.addEventListener('mousemove', mouseMove, false);
 });
 
-canvas.addEventListener('mouseup', function() {
+canvas.addEventListener('mouseup', function(evt) {
+  var mousePos = getMousePos(canvas, evt);
+
+  if(currentState == 'rectangle'){
+    var dx = mousePos.x - mouseStartX;
+    var dy = mousePos.y - mouseStartY;
+
+    shapeCtx.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);
+    ctx.strokeRect(mouseStartX, mouseStartY, dx, dy);
+  }
+
   canvas.removeEventListener('mousemove', mouseMove, false);
 }, false);
 
@@ -111,6 +144,8 @@ function drawColorPicker(){
   ctx.strokeStyle = 'rgb(' + imgData.data[0] + ',' + imgData.data[1] + ',' + imgData.data[2] + ')';
   /* font color */
   ctx.fillStyle = 'rgb(' + imgData.data[0] + ',' + imgData.data[1] + ',' + imgData.data[2] + ')';
+  /* shape canvas color */
+  shapeCtx.strokeStyle = 'rgb(' + imgData.data[0] + ',' + imgData.data[1] + ',' + imgData.data[2] + ')';
 }
 
 /* keep redraw color picker */
@@ -137,6 +172,8 @@ colorPickerCanvas.addEventListener('mouseup', function() {
 
 /* declare functions */
 var currentState = '';
+/* init state */
+toBrush();
 
 function toBrush(){
   console.log('toBrush');
@@ -150,7 +187,7 @@ function toBrush(){
 function toEraser(){
   console.log('toEraser');
 
-  currentState = 'erase';
+  currentState = 'eraser';
   canvas.style.cursor = "url(./img/eraser-solid.svg) 0 32, auto";
   ctx.globalCompositeOperation="destination-out";
 }
