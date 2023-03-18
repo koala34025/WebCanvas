@@ -272,4 +272,9 @@ function upload(){
 
 function download(){
   console.log('download');
+
+  var link = document.createElement('a');
+  link.download = 'canvas.png';
+  link.href = backCanvas.toDataURL()
+  link.click();
 }
