@@ -1,9 +1,10 @@
-var canvas = document.getElementById('myCanvas');
-var ctx = canvas.getContext('2d');
+/* listen events and draw shapes */
+var frontCanvas = document.getElementById('frontCanvas');
+var frontCtx = frontCanvas.getContext('2d');
 
-/* shape canvas */
-var shapeCanvas = document.getElementById('shapeCanvas');
-var shapeCtx = shapeCanvas.getContext('2d');
+/* draw lines and final shapes */
+var backCanvas = document.getElementById('backCanvas');
+var backCtx = backCanvas.getContext('2d');
 
 /* black line drawing */
 function getMousePos(canvas, evt) {
@@ -15,20 +16,20 @@ function getMousePos(canvas, evt) {
 }
 
 function mouseMove(evt) {
-  var mousePos = getMousePos(canvas, evt);
+  var mousePos = getMousePos(frontCanvas, evt);
 
   console.log(currentState);
 
   if(currentState == 'brush' || currentState == 'eraser'){
-    ctx.lineTo(mousePos.x, mousePos.y);
-    ctx.stroke();
+    backCtx.lineTo(mousePos.x, mousePos.y);
+    backCtx.stroke();
   }
   else if(currentState == 'rectangle'){
     var dx = mousePos.x - mouseStartX;
     var dy = mousePos.y - mouseStartY;
 
-    shapeCtx.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);
-    shapeCtx.strokeRect(mouseStartX, mouseStartY, dx, dy);
+    frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+    frontCtx.strokeRect(mouseStartX, mouseStartY, dx, dy);
   }
 }
 
@@ -36,58 +37,58 @@ function mouseMove(evt) {
 var mouseStartX = 0;
 var mouseStartY = 0;
 
-canvas.addEventListener('mousedown', function(evt) {
+frontCanvas.addEventListener('mousedown', function(evt) {
   if(currentState == 'typer'){
     return;
   }
 
-  var mousePos = getMousePos(canvas, evt);
-  ctx.beginPath();
-  ctx.moveTo(mousePos.x, mousePos.y);
+  var mousePos = getMousePos(frontCanvas, evt);
+  backCtx.beginPath();
+  backCtx.moveTo(mousePos.x, mousePos.y);
 
-  ctx.lineWidth = brushSize;
-  shapeCtx.lineWidth = brushSize;
+  frontCtx.lineWidth = brushSize;
+  backCtx.lineWidth = brushSize;
 
   mouseStartX = mousePos.x;
   mouseStartY = mousePos.y;
 
   evt.preventDefault();
-  canvas.addEventListener('mousemove', mouseMove, false);
+  frontCanvas.addEventListener('mousemove', mouseMove, false);
 });
 
-canvas.addEventListener('mouseup', function(evt) {
-  var mousePos = getMousePos(canvas, evt);
+frontCanvas.addEventListener('mouseup', function(evt) {
+  var mousePos = getMousePos(frontCanvas, evt);
 
   if(currentState == 'rectangle'){
     var dx = mousePos.x - mouseStartX;
     var dy = mousePos.y - mouseStartY;
 
-    shapeCtx.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);
-    ctx.strokeRect(mouseStartX, mouseStartY, dx, dy);
+    frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+    backCtx.strokeRect(mouseStartX, mouseStartY, dx, dy);
   }
 
-  canvas.removeEventListener('mousemove', mouseMove, false);
+  frontCanvas.removeEventListener('mousemove', mouseMove, false);
 }, false);
 
 var fontFamily = document.getElementById('fontFamily');
 var fontSize = document.getElementById('fontSize');
 /* listen to text input click */
-canvas.addEventListener('click', function(evt){
+frontCanvas.addEventListener('click', function(evt){
   if(currentState != 'typer'){
     return;
   }
 
-  var mousePos = getMousePos(canvas, evt);
+  var mousePos = getMousePos(frontCanvas, evt);
   var input = document.createElement('input');
 
   input.type = 'text';
   input.style.position = 'fixed';
-  input.style.left = `${mousePos.x + 150}px`;
+  input.style.left = `${mousePos.x + 105}px`;
   input.style.top = `${mousePos.y - 10}px`;
   input.onkeydown = function(evt){
     if (evt.key === 'Enter') {
-      ctx.font = fontSize.value + "px " + fontFamily.value;
-      ctx.fillText(this.value, parseInt(this.style.left, 10)-150, parseInt(this.style.top, 10)+15);
+      backCtx.font = fontSize.value + "px " + fontFamily.value;
+      backCtx.fillText(this.value, parseInt(this.style.left, 10)-105, parseInt(this.style.top, 10)+15);
       document.body.removeChild(this);
     }
   };
@@ -141,11 +142,11 @@ function drawColorPicker(){
 
   /* change color according to xy */
   var imgData = colorPickerCtx.getImageData(colorPickerX, colorPickerY, 1, 1);
-  ctx.strokeStyle = 'rgb(' + imgData.data[0] + ',' + imgData.data[1] + ',' + imgData.data[2] + ')';
+  frontCtx.strokeStyle = 'rgb(' + imgData.data[0] + ',' + imgData.data[1] + ',' + imgData.data[2] + ')';
   /* font color */
-  ctx.fillStyle = 'rgb(' + imgData.data[0] + ',' + imgData.data[1] + ',' + imgData.data[2] + ')';
+  backCtx.fillStyle = 'rgb(' + imgData.data[0] + ',' + imgData.data[1] + ',' + imgData.data[2] + ')';
   /* shape canvas color */
-  shapeCtx.strokeStyle = 'rgb(' + imgData.data[0] + ',' + imgData.data[1] + ',' + imgData.data[2] + ')';
+  backCtx.strokeStyle = 'rgb(' + imgData.data[0] + ',' + imgData.data[1] + ',' + imgData.data[2] + ')';
 }
 
 /* keep redraw color picker */
@@ -179,8 +180,8 @@ function toBrush(){
   console.log('toBrush');
 
   currentState = 'brush';
-  canvas.style.cursor = "url(./img/paintbrush-solid.svg) 0 32, auto";
-  ctx.globalCompositeOperation="source-over";
+  frontCanvas.style.cursor = "url(./img/paintbrush-solid.svg) 0 32, auto";
+  backCtx.globalCompositeOperation="source-over";
 
 }
 
@@ -188,8 +189,8 @@ function toEraser(){
   console.log('toEraser');
 
   currentState = 'eraser';
-  canvas.style.cursor = "url(./img/eraser-solid.svg) 0 32, auto";
-  ctx.globalCompositeOperation="destination-out";
+  frontCanvas.style.cursor = "url(./img/eraser-solid.svg) 0 32, auto";
+  backCtx.globalCompositeOperation="destination-out";
 }
 
 /* text input */
@@ -197,8 +198,8 @@ function toTyper(){
   console.log('toTyper');
 
   currentState = 'typer';
-  canvas.style.cursor = "url(./img/keyboard-solid.svg) 0 0, auto";
-  ctx.globalCompositeOperation="source-over";
+  frontCanvas.style.cursor = "url(./img/keyboard-solid.svg) 0 0, auto";
+  backCtx.globalCompositeOperation="source-over";
 }
 
 
@@ -206,24 +207,24 @@ function toCircle(){
   console.log('toCircle');
 
   currentState = 'circle';
-  canvas.style.cursor = "url(./img/circle-regular.svg) 8 8, auto";
-  ctx.globalCompositeOperation="source-over";
+  frontCanvas.style.cursor = "url(./img/circle-regular.svg) 8 8, auto";
+  backCtx.globalCompositeOperation="source-over";
 }
 
 function toTriangle(){
   console.log('toTriangle');
 
   currentState = 'triangle';
-  canvas.style.cursor = "url(./img/triangle.svg) 8 8, auto";
-  ctx.globalCompositeOperation="source-over";
+  frontCanvas.style.cursor = "url(./img/triangle.svg) 8 8, auto";
+  backCtx.globalCompositeOperation="source-over";
 }
 
 function toRectangle(){
   console.log('toRectangle');
 
   currentState = 'rectangle';
-  canvas.style.cursor = "url(./img/square-regular.svg) 0 0, auto";
-  ctx.globalCompositeOperation="source-over";
+  frontCanvas.style.cursor = "url(./img/square-regular.svg) 0 0, auto";
+  backCtx.globalCompositeOperation="source-over";
 }
 
 function undo(){
@@ -237,7 +238,7 @@ function redo(){
 function clean(){
   console.log('clean');
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
 }
 
 function upload(){
