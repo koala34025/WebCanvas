@@ -1,5 +1,6 @@
 var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
+toBrush();
 
 /* black line drawing */
 function getMousePos(canvas, evt) {
@@ -160,6 +161,7 @@ function toTyper(){
 
   currentState = 'typer';
   canvas.style.cursor = "url(./img/keyboard-solid.svg) 0 0, auto";
+  ctx.globalCompositeOperation="source-over";
 }
 
 
@@ -168,6 +170,7 @@ function toCircle(){
 
   currentState = 'circle';
   canvas.style.cursor = "url(./img/circle-regular.svg) 8 8, auto";
+  ctx.globalCompositeOperation="source-over";
 }
 
 function toTriangle(){
@@ -175,6 +178,7 @@ function toTriangle(){
 
   currentState = 'triangle';
   canvas.style.cursor = "url(./img/triangle.svg) 8 8, auto";
+  ctx.globalCompositeOperation="source-over";
 }
 
 function toRectangle(){
@@ -182,6 +186,7 @@ function toRectangle(){
 
   currentState = 'rectangle';
   canvas.style.cursor = "url(./img/square-regular.svg) 0 0, auto";
+  ctx.globalCompositeOperation="source-over";
 }
 
 function undo(){
