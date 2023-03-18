@@ -17,6 +17,10 @@ function mouseMove(evt) {
 }
 
 canvas.addEventListener('mousedown', function(evt) {
+  if(currentState == 'typer'){
+    return;
+  }
+
   var mousePos = getMousePos(canvas, evt);
   ctx.beginPath();
   ctx.moveTo(mousePos.x, mousePos.y);
@@ -31,6 +35,34 @@ canvas.addEventListener('mouseup', function() {
   canvas.removeEventListener('mousemove', mouseMove, false);
 }, false);
 
+var fontFamily = document.getElementById('fontFamily');
+var fontSize = document.getElementById('fontSize');
+/* listen to text input click */
+canvas.addEventListener('click', function(evt){
+  if(currentState != 'typer'){
+    return;
+  }
+
+  var mousePos = getMousePos(canvas, evt);
+  var input = document.createElement('input');
+
+  input.type = 'text';
+  input.style.position = 'fixed';
+  input.style.left = `${mousePos.x + 150}px`;
+  input.style.top = `${mousePos.y - 10}px`;
+  input.onkeydown = function(evt){
+    if (evt.key === 'Enter') {
+      ctx.font = fontSize.value + "px " + fontFamily.value;
+      ctx.fillText(this.value, parseInt(this.style.left, 10)-150, parseInt(this.style.top, 10)+15);
+      document.body.removeChild(this);
+    }
+  };
+
+  document.body.appendChild(input);
+  input.focus();
+});
+
+
 /* brush size slider */
 var brushSizeSlider = document.getElementById('brushSize');
 var brushSize = "12";
@@ -41,7 +73,7 @@ brushSizeSlider.oninput = function(){
 
 /* color picker */
 var colorPickerCanvas = document.getElementById('colorPicker');
-var colorPickerCtx = colorPickerCanvas.getContext('2d');
+var colorPickerCtx = colorPickerCanvas.getContext('2d', {willReadFrequently: true});
 
 var colorPickerX = 0;
 var colorPickerY = 200;
@@ -101,41 +133,52 @@ colorPickerCanvas.addEventListener('mouseup', function() {
 }, false);
 
 /* declare functions */
+var currentState = '';
+
 function toBrush(){
   console.log('toBrush');
 
+  currentState = 'brush';
   canvas.style.cursor = "url(./img/paintbrush-solid.svg) 0 32, auto";
   ctx.globalCompositeOperation="source-over";
+
 }
 
 function toEraser(){
   console.log('toEraser');
 
+  currentState = 'erase';
   canvas.style.cursor = "url(./img/eraser-solid.svg) 0 32, auto";
   ctx.globalCompositeOperation="destination-out";
 }
 
+/* text input */
 function toTyper(){
   console.log('toTyper');
 
+  currentState = 'typer';
   canvas.style.cursor = "url(./img/keyboard-solid.svg) 0 0, auto";
 }
+
 
 function toCircle(){
   console.log('toCircle');
 
+  currentState = 'circle';
   canvas.style.cursor = "url(./img/circle-regular.svg) 8 8, auto";
 }
 
 function toTriangle(){
   console.log('toTriangle');
 
+  currentState = 'triangle';
   canvas.style.cursor = "url(./img/triangle.svg) 8 8, auto";
 }
 
 function toRectangle(){
   console.log('toRectangle');
 
+  currentState = 'rectangle';
   canvas.style.cursor = "url(./img/square-regular.svg) 0 0, auto";
 }
 
