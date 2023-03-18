@@ -37,10 +37,10 @@ function mouseMove(evt) {
   }
   else if(currentState == 'triangle'){
     frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
-    frontCtx.moveTo(mouseStartX, mouseStartY);
+    frontCtx.moveTo(mouseStartX + dx/2, mouseStartY);
     frontCtx.lineTo(mousePos.x, mousePos.y);
     frontCtx.lineTo(mouseStartX, mousePos.y);
-    frontCtx.lineTo(mouseStartX, mouseStartY);
+    frontCtx.lineTo(mouseStartX + dx/2, mouseStartY);
     frontCtx.stroke();
     frontCtx.beginPath();
   }
@@ -85,10 +85,10 @@ frontCanvas.addEventListener('mouseup', function(evt) {
   }
   else if(currentState == 'triangle'){
     frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
-    backCtx.moveTo(mouseStartX, mouseStartY);
+    backCtx.moveTo(mouseStartX + dx/2, mouseStartY);
     backCtx.lineTo(mousePos.x, mousePos.y);
     backCtx.lineTo(mouseStartX, mousePos.y);
-    backCtx.lineTo(mouseStartX, mouseStartY);
+    backCtx.lineTo(mouseStartX + dx/2, mouseStartY);
     backCtx.stroke();
   }
 
