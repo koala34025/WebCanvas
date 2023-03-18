@@ -268,6 +268,19 @@ function clean(){
 
 function upload(){
   console.log('upload');
+
+  var input = document.createElement('input');
+
+  input.type = 'file';
+  input.click();
+
+  input.onchange = function(e) {
+    var img = new Image();
+    img.onload = function () {
+      backCtx.drawImage(this, 0, 0);
+    };
+    img.src = URL.createObjectURL(this.files[0]);
+  };
 }
 
 function download(){
