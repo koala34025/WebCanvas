@@ -133,6 +133,8 @@ frontCanvas.addEventListener('mouseup', function(evt) {
       backCtx.fillRect(0, 0, backCanvas.width, backCanvas.height);
       save();
     };
+
+    frontCtx.setLineDash([]);
   }
   else if(currentState == 'dash_spin'){
     frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
@@ -159,6 +161,8 @@ frontCanvas.addEventListener('mouseup', function(evt) {
       backCtx.restore();
 
       save();
+
+      frontCtx.setLineDash([]);
     };
   }
 
