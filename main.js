@@ -52,7 +52,7 @@ function mouseMove(evt) {
     frontCtx.stroke();
     frontCtx.beginPath();
   }
-  else if(currentState == 'dash'){
+  else if(currentState == 'dash_repeat' || currentState == 'dash_spin'){
     frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
     frontCtx.setLineDash([4, 2]);
     frontCtx.lineDashOffset = -offset;
@@ -74,7 +74,7 @@ frontCanvas.addEventListener('mousedown', function(evt) {
 
   frontCtx.lineWidth = brushSize;
   backCtx.lineWidth = brushSize;
-  if(currentState == 'dash'){
+  if(currentState == 'dash_repeat' || currentState == 'dash_spin'){
     frontCtx.lineWidth = 1;
   }
 
@@ -95,7 +95,7 @@ frontCanvas.addEventListener('mouseup', function(evt) {
   var dx = mousePos.x - mouseStartX;
   var dy = mousePos.y - mouseStartY;
 
-  if(currentState == 'brush'){
+  if(currentState == 'brush' || currentState == 'eraser'){
     save();
   }
   else if(currentState == 'rectangle'){
@@ -119,21 +119,63 @@ frontCanvas.addEventListener('mouseup', function(evt) {
     backCtx.stroke();
     save();
   }
-  else if(currentState == 'dash'){
+  else if(currentState == 'dash_repeat'){
+    frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+    
+    var imgData = backCtx.getImageData(mouseStartX, mouseStartY, dx, dy);
+
+    var img = imagedata_to_image(imgData);
+
+    img.onload = function() {
+      var ptrn = backCtx.createPattern(this, 'repeat');
+      backCtx.fillStyle = ptrn;
+      backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
+      backCtx.fillRect(0, 0, backCanvas.width, backCanvas.height);
+      save();
+    };
+  }
+  else if(currentState == 'dash_spin'){
     frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
 
     var imgData = backCtx.getImageData(mouseStartX, mouseStartY, dx, dy);
-    
-    for (let i = 0; i <= backCanvas.width; i += Math.abs(dx)) {
-      for (let j = 0; j <= backCanvas.height; j += Math.abs(dy)) {
-        backCtx.putImageData(imgData, i, j);
-      }
-    }
-    save();
+
+    var img = imagedata_to_image(imgData);
+
+    img.onload = function() {
+      var topLeftX = Math.min(mouseStartX, mouseStartX+dx);
+      var topLeftY = Math.min(mouseStartY, mouseStartY+dy);
+      dx = Math.abs(dx);
+      dy = Math.abs(dy);
+
+      backCtx.save();
+
+      backCtx.translate(topLeftX + dx/2, topLeftY + dy/2);
+      backCtx.rotate(Math.PI / 2);
+      backCtx.translate(-(topLeftX + dx/2), -(topLeftY + dy/2));
+
+      backCtx.clearRect(topLeftX, topLeftY, dx, dy);
+      backCtx.drawImage(this, topLeftX, topLeftY);
+
+      backCtx.restore();
+
+      save();
+    };
   }
 
   frontCanvas.removeEventListener('mousemove', mouseMove, false);
 }, false);
+
+function imagedata_to_image(imagedata) {
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  canvas.width = imagedata.width;
+  canvas.height = imagedata.height;
+  ctx.putImageData(imagedata, 0, 0);
+
+  var image = new Image();
+  image.src = canvas.toDataURL();
+  return image;
+}
 
 var fontFamily = document.getElementById('fontFamily');
 var fontSize = document.getElementById('fontSize');
@@ -357,7 +399,7 @@ function drawHeart(x, y) {
 
 /* widget 2: line dashes select */
 function repeat(){
-  currentState = 'dash';
+  currentState = 'dash_repeat';
   frontCanvas.style.cursor = "url(./img/repeat-solid.svg) 5 5, auto";
   backCtx.globalCompositeOperation="source-over";
 }
@@ -373,3 +415,10 @@ function march() {
 }
 
 march();
+
+/* widget 3: spin 90 */
+function spin(){
+  currentState = 'dash_spin';
+  frontCanvas.style.cursor = "url(./img/arrows-spin-solid.svg) 5 5, auto";
+  backCtx.globalCompositeOperation="source-over";
+}
