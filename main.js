@@ -7,8 +7,11 @@ var backCanvas = document.getElementById('backCanvas');
 var backCtx = backCanvas.getContext('2d');
 
 /* redo undo state */
-let state = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
-window.history.pushState(state, null);
+function save(){
+  let state = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
+  window.history.pushState(state, null);
+}
+save();
 
 /* black line drawing */
 function getMousePos(canvas, evt) {
@@ -56,7 +59,7 @@ var mouseStartX = 0;
 var mouseStartY = 0;
 
 frontCanvas.addEventListener('mousedown', function(evt) {
-  if(currentState == 'typer'){
+  if(currentState == 'typer' || currentState == 'heart'){
     return;
   }
 
@@ -100,40 +103,45 @@ frontCanvas.addEventListener('mouseup', function(evt) {
 
   frontCanvas.removeEventListener('mousemove', mouseMove, false);
 
-  let state = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
-  window.history.pushState(state, null);
+  save();
 }, false);
 
 var fontFamily = document.getElementById('fontFamily');
 var fontSize = document.getElementById('fontSize');
+
 /* listen to text input click */
+/* also heart stamp */
 frontCanvas.addEventListener('click', function(evt){
-  if(currentState != 'typer'){
+  if(currentState != 'typer' && currentState != 'heart'){
     return;
   }
 
   var mousePos = getMousePos(frontCanvas, evt);
-  var input = document.createElement('input');
 
-  input.type = 'text';
-  input.style.position = 'fixed';
-  input.style.left = `${mousePos.x + 105}px`;
-  input.style.top = `${mousePos.y - 10}px`;
-  input.onkeydown = function(evt){
-    if (evt.key === 'Enter') {
-      backCtx.font = fontSize.value + "px " + fontFamily.value;
-      backCtx.fillText(this.value, parseInt(this.style.left, 10)-105, parseInt(this.style.top, 10)+15);
-      document.body.removeChild(this);
+  if(currentState == 'typer'){
+    var input = document.createElement('input');
 
-      let state = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
-      window.history.pushState(state, null);
-    }
-  };
+    input.type = 'text';
+    input.style.position = 'fixed';
+    input.style.left = `${mousePos.x + 105}px`;
+    input.style.top = `${mousePos.y - 10}px`;
+    input.onkeydown = function(evt){
+      if (evt.key === 'Enter') {
+        backCtx.font = fontSize.value + "px " + fontFamily.value;
+        backCtx.fillText(this.value, parseInt(this.style.left, 10)-105, parseInt(this.style.top, 10)+15);
+        document.body.removeChild(this);
 
-  document.body.appendChild(input);
-  input.focus();
+        save();
+      }
+    };
+
+    document.body.appendChild(input);
+    input.focus();
+  }
+  else if(currentState == 'heart'){
+    drawHeart(mousePos.x-60, mousePos.y-55);
+  }
 });
-
 
 /* brush size slider */
 var brushSizeSlider = document.getElementById('brushSize');
@@ -214,17 +222,12 @@ var currentState = '';
 toBrush();
 
 function toBrush(){
-  console.log('toBrush');
-
   currentState = 'brush';
   frontCanvas.style.cursor = "url(./img/paintbrush-solid.svg) 0 32, auto";
   backCtx.globalCompositeOperation="source-over";
-
 }
 
 function toEraser(){
-  console.log('toEraser');
-
   currentState = 'eraser';
   frontCanvas.style.cursor = "url(./img/eraser-solid.svg) 0 32, auto";
   backCtx.globalCompositeOperation="destination-out";
@@ -232,8 +235,6 @@ function toEraser(){
 
 /* text input */
 function toTyper(){
-  console.log('toTyper');
-
   currentState = 'typer';
   frontCanvas.style.cursor = "url(./img/keyboard-solid.svg) 0 0, auto";
   backCtx.globalCompositeOperation="source-over";
@@ -241,24 +242,18 @@ function toTyper(){
 
 
 function toCircle(){
-  console.log('toCircle');
-
   currentState = 'circle';
   frontCanvas.style.cursor = "url(./img/circle-regular.svg) 8 8, auto";
   backCtx.globalCompositeOperation="source-over";
 }
 
 function toTriangle(){
-  console.log('toTriangle');
-
   currentState = 'triangle';
   frontCanvas.style.cursor = "url(./img/triangle.svg) 8 8, auto";
   backCtx.globalCompositeOperation="source-over";
 }
 
 function toRectangle(){
-  console.log('toRectangle');
-
   currentState = 'rectangle';
   frontCanvas.style.cursor = "url(./img/square-regular.svg) 0 0, auto";
   backCtx.globalCompositeOperation="source-over";
@@ -317,4 +312,26 @@ function download(){
   link.download = 'canvas.png';
   link.href = backCanvas.toDataURL()
   link.click();
+}
+
+/* widget 1: heart stamp */
+function toHeart(){
+  currentState = 'heart';
+  frontCanvas.style.cursor = "url(./img/heart-solid.svg) 0 0, auto";
+  backCtx.globalCompositeOperation="source-over";
+}
+
+function drawHeart(x, y) {
+  // Cubic curves example
+  backCtx.beginPath();
+  backCtx.moveTo(75+x, 40+y);
+  backCtx.bezierCurveTo(75+x, 37+y, 70+x, 25+y, 50+x, 25+y);
+  backCtx.bezierCurveTo(20+x, 25+y, 20+x, 62.5+y, 20+x, 62.5+y);
+  backCtx.bezierCurveTo(20+x, 80+y, 40+x, 102+y, 75+x, 120+y);
+  backCtx.bezierCurveTo(110+x, 102+y, 130+x, 80+y, 130+x, 62.5+y);
+  backCtx.bezierCurveTo(130+x, 62.5+y, 130+x, 25+y, 100+x, 25+y);
+  backCtx.bezierCurveTo(85+x, 25+y, 75+x, 37+y, 75+x, 40+y);
+  backCtx.fill();
+
+  save();
 }
