@@ -45,6 +45,7 @@ function mouseMove(evt) {
     frontCtx.lineTo(mousePos.x, mousePos.y);
     frontCtx.lineTo(mouseStartX, mousePos.y);
     frontCtx.lineTo(mouseStartX + dx/2, mouseStartY);
+    frontCtx.closePath();
     frontCtx.stroke();
     frontCtx.beginPath();
   }
@@ -93,6 +94,7 @@ frontCanvas.addEventListener('mouseup', function(evt) {
     backCtx.lineTo(mousePos.x, mousePos.y);
     backCtx.lineTo(mouseStartX, mousePos.y);
     backCtx.lineTo(mouseStartX + dx/2, mouseStartY);
+    backCtx.closePath();
     backCtx.stroke();
   }
 
