@@ -52,6 +52,12 @@ function mouseMove(evt) {
     frontCtx.stroke();
     frontCtx.beginPath();
   }
+  else if(currentState == 'dash'){
+    frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+    frontCtx.setLineDash([4, 2]);
+    frontCtx.lineDashOffset = -offset;
+    frontCtx.strokeRect(mouseStartX, mouseStartY, dx, dy);
+  }
 }
 
 /* mouse dragging info */
@@ -68,6 +74,9 @@ frontCanvas.addEventListener('mousedown', function(evt) {
 
   frontCtx.lineWidth = brushSize;
   backCtx.lineWidth = brushSize;
+  if(currentState == 'dash'){
+    frontCtx.lineWidth = 1;
+  }
 
   mouseStartX = mousePos.x;
   mouseStartY = mousePos.y;
@@ -86,14 +95,19 @@ frontCanvas.addEventListener('mouseup', function(evt) {
   var dx = mousePos.x - mouseStartX;
   var dy = mousePos.y - mouseStartY;
 
-  if(currentState == 'rectangle'){
+  if(currentState == 'brush'){
+    save();
+  }
+  else if(currentState == 'rectangle'){
     frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
     backCtx.strokeRect(mouseStartX, mouseStartY, dx, dy);
+    save();
   }
   else if(currentState == 'circle'){
     frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
     backCtx.ellipse(mouseStartX + dx/2, mouseStartY + dy/2, Math.abs(dx)/2, Math.abs(dy)/2, 0, 0, Math.PI*2);
     backCtx.stroke();
+    save();
   }
   else if(currentState == 'triangle'){
     frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
@@ -103,11 +117,22 @@ frontCanvas.addEventListener('mouseup', function(evt) {
     backCtx.lineTo(mouseStartX + dx/2, mouseStartY);
     backCtx.closePath();
     backCtx.stroke();
+    save();
+  }
+  else if(currentState == 'dash'){
+    frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+
+    var imgData = backCtx.getImageData(mouseStartX, mouseStartY, dx, dy);
+    
+    for (let i = 0; i <= backCanvas.width; i += Math.abs(dx)) {
+      for (let j = 0; j <= backCanvas.height; j += Math.abs(dy)) {
+        backCtx.putImageData(imgData, i, j);
+      }
+    }
+    save();
   }
 
   frontCanvas.removeEventListener('mousemove', mouseMove, false);
-
-  save();
 }, false);
 
 var fontFamily = document.getElementById('fontFamily');
@@ -129,6 +154,7 @@ frontCanvas.addEventListener('click', function(evt){
     input.style.position = 'fixed';
     input.style.left = `${mousePos.x + 105}px`;
     input.style.top = `${mousePos.y - 10}px`;
+    input.style.zIndex = 2;
     input.onkeydown = function(evt){
       if (evt.key === 'Enter') {
         backCtx.font = fontSize.value + "px " + fontFamily.value;
@@ -265,14 +291,10 @@ function toRectangle(){
 }
 
 function undo(){
-  console.log('undo');
-
   history.back();
 }
 
 function redo(){
-  console.log('redo');
-
   history.forward();
 }
 
@@ -285,17 +307,12 @@ window.addEventListener('popstate', function(evt){
 }, false);
 
 function clean(){
-  console.log('clean');
-
   backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
 
-  let state = backCtx.getImageData(0, 0, backCanvas.width, backCanvas.height);
-  window.history.pushState(state, null);
+  save();
 }
 
 function upload(){
-  console.log('upload');
-
   var input = document.createElement('input');
 
   input.type = 'file';
@@ -305,17 +322,16 @@ function upload(){
     var img = new Image();
     img.onload = function () {
       backCtx.drawImage(this, 0, 0);
+      save();
     };
     img.src = URL.createObjectURL(this.files[0]);
   };
 }
 
 function download(){
-  console.log('download');
-
   var link = document.createElement('a');
   link.download = 'canvas.png';
-  link.href = backCanvas.toDataURL()
+  link.href = backCanvas.toDataURL();
   link.click();
 }
 
@@ -338,3 +354,22 @@ function drawHeart(x, y) {
   backCtx.bezierCurveTo(85+x, 25+y, 75+x, 37+y, 75+x, 40+y);
   backCtx.fill();
 }
+
+/* widget 2: line dashes select */
+function repeat(){
+  currentState = 'dash';
+  frontCanvas.style.cursor = "url(./img/repeat-solid.svg) 5 5, auto";
+  backCtx.globalCompositeOperation="source-over";
+}
+
+let offset = 0;
+
+function march() {
+  offset++;
+  if (offset > 16) {
+    offset = 0;
+  }
+  setTimeout(march, 2);
+}
+
+march();
