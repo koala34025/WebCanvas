@@ -77,6 +77,10 @@ frontCanvas.addEventListener('mousedown', function(evt) {
 });
 
 frontCanvas.addEventListener('mouseup', function(evt) {
+  if(currentState == 'typer' || currentState == 'heart'){
+    return;
+  }
+
   var mousePos = getMousePos(frontCanvas, evt);
 
   var dx = mousePos.x - mouseStartX;
@@ -140,6 +144,7 @@ frontCanvas.addEventListener('click', function(evt){
   }
   else if(currentState == 'heart'){
     drawHeart(mousePos.x-60, mousePos.y-55);
+    save();
   }
 });
 
@@ -332,6 +337,4 @@ function drawHeart(x, y) {
   backCtx.bezierCurveTo(130+x, 62.5+y, 130+x, 25+y, 100+x, 25+y);
   backCtx.bezierCurveTo(85+x, 25+y, 75+x, 37+y, 75+x, 40+y);
   backCtx.fill();
-
-  save();
 }
